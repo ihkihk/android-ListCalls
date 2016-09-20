@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">List Calls</string>
+    <string name="missing">Missing</string>
+    <string name="outgoing">Outgoing</string>
+    <string name="incoming">Incoming</string>
+    <string name="all">All</string>
+</resources>
