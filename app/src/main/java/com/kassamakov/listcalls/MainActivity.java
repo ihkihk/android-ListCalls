@@ -2,7 +2,6 @@ package com.kassamakov.listcalls;
 
 import android.app.Activity;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.view.Gravity;
@@ -14,10 +13,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends Activity
         implements OnClickListener {
@@ -57,12 +56,13 @@ public class MainActivity extends Activity
     public void onClick(View v) {
         Cursor cursor;
 
-        Toast.makeText(this, "hello", Toast.LENGTH_SHORT).show();
+        String[] cols = new String[]{"date", "name", "number", "geocoded_location", "duration"};
+
         try {
             switch (v.getId()) {
                 case R.id.btnAll:
                     cursor = this.getContentResolver().query(CallLog.Calls.CONTENT_URI,
-                            null,
+                            cols,
                             null,
                             null,
                             CallLog.Calls.DATE + " DESC");
@@ -72,7 +72,7 @@ public class MainActivity extends Activity
 
                 case R.id.btnIncoming:
                     cursor = this.getContentResolver().query(CallLog.Calls.CONTENT_URI,
-                            null,
+                            cols,
                             CallLog.Calls.TYPE + " = " + CallLog.Calls.INCOMING_TYPE,
                             null,
                             CallLog.Calls.DATE + " DESC");
@@ -82,7 +82,7 @@ public class MainActivity extends Activity
 
                 case R.id.btnOutgoing:
                     cursor = this.getContentResolver().query(CallLog.Calls.CONTENT_URI,
-                            null,
+                            cols,
                             CallLog.Calls.TYPE + " = " + CallLog.Calls.OUTGOING_TYPE,
                             null,
                             CallLog.Calls.DATE + " DESC");
@@ -92,7 +92,7 @@ public class MainActivity extends Activity
 
                 case R.id.btnMissed:
                     cursor = this.getContentResolver().query(CallLog.Calls.CONTENT_URI,
-                            null,
+                            cols,
                             CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE,
                             null,
                             CallLog.Calls.DATE + " DESC");
@@ -144,7 +144,14 @@ public class MainActivity extends Activity
                 TextView textView = new TextView(this);
 
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                textView.setText(cursor.getString(j));
+
+                if (cursor.getColumnName(j).equals("date")) {
+                    textView.setText(DateFormat.getDateTimeInstance().format(new Date(cursor.getLong(j))));
+                } else if (cursor.getColumnName(j).equals("duration")) {
+                    textView.setText(new SimpleDateFormat("mm:ss", Locale.US).format(new Date(cursor.getLong(j) * 1000)));
+                } else {
+                    textView.setText(cursor.getString(j));
+                }
                 textView.setPadding(0, 0, 5, 0);
 
                 row.addView(textView);
